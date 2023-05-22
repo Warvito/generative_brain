@@ -1,0 +1,10 @@
+lpips==0.1.4
+pre-commit
+monai>=1.2.0rc1
+tensorboardX
+omegaconf==2.3.0
+spacy
+transformers[torch]
+isort
+black
+monai-generative
