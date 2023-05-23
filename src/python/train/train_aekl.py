@@ -80,10 +80,6 @@ def main(args):
 
     print(f"Let's use {torch.cuda.device_count()} GPUs!")
     device = torch.device("cuda")
-    if torch.cuda.device_count() > 1:
-        model = torch.nn.DataParallel(model)
-        discriminator = torch.nn.DataParallel(discriminator)
-        perceptual_loss = torch.nn.DataParallel(perceptual_loss)
 
     model = model.to(device)
     perceptual_loss = perceptual_loss.to(device)

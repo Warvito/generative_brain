@@ -14,14 +14,17 @@ runai submit \
   --name brain-aekl-v0 \
   --image aicregistry:5000/wds20:ldm_brain \
   --backoff-limit 0 \
-  --gpu 8 \
-  --cpu 32 \
+  --gpu 1 \
+  --cpu 4 \
   --large-shm \
   --run-as-user \
   --node-type "A100" \
   --host-ipc \
   --project wds20 \
   --volume /nfs/home/wds20/projects/generative-brain/:/project/ \
+  --volume /nfs/project/AMIGO/Biobank/derivatives/super-res/:/data/ \
+  --command -- sleep infinity
+
   --command -- bash /project/src/bash/start_script.sh \
     python3 /project/src/python/training/train_aekl.py \
       seed=${seed} \
