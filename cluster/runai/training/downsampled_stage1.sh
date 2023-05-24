@@ -2,11 +2,11 @@ seed=42
 run_dir="downsampled_aekl_v0"
 training_ids="/project/outputs/ids/train.tsv"
 validation_ids="/project/outputs/ids/validation.tsv"
-config_file="/project/configs/stage1/aekl_v0.yaml"
-batch_size=1
-n_epochs=75
+config_file="/project/configs/downsampled_stage1/aekl_v0.yaml"
+batch_size=4
+n_epochs=50
 adv_start=5
-eval_freq=3
+eval_freq=1
 num_workers=8
 experiment="DOWN-AEKL"
 
