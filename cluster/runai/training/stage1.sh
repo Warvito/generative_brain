@@ -3,11 +3,11 @@ run_dir="aekl_v0"
 training_ids="/project/outputs/ids/train.tsv"
 validation_ids="/project/outputs/ids/validation.tsv"
 config_file="/project/configs/stage1/aekl_v0.yaml"
-batch_size=96
+batch_size=1
 n_epochs=75
 adv_start=5
 eval_freq=3
-num_workers=64
+num_workers=8
 experiment="AEKL"
 
 runai submit \
@@ -21,10 +21,8 @@ runai submit \
   --node-type "A100" \
   --host-ipc \
   --project wds20 \
-  --volume /nfs/home/wds20/projects/generative-brain/:/project/ \
+  --volume /nfs/home/wds20/projects/generative_brain/:/project/ \
   --volume /nfs/project/AMIGO/Biobank/derivatives/super-res/:/data/ \
-  --command -- sleep infinity
-
   --command -- bash /project/src/bash/start_script.sh \
     python3 /project/src/python/training/train_aekl.py \
       seed=${seed} \
