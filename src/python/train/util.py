@@ -22,7 +22,6 @@ def get_datalist(
         data_dicts.append(
             {
                 "image": str(row["image"]),
-                "report": str(row["report"]),
             }
         )
 
