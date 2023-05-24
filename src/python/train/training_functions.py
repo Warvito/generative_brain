@@ -10,6 +10,7 @@ from pynvml.smi import nvidia_smi
 from tensorboardX import SummaryWriter
 from torch.cuda.amp import GradScaler, autocast
 from tqdm import tqdm
+from util import log_reconstructions
 
 
 def get_lr(optimizer):
@@ -157,7 +158,7 @@ def train_epoch_aekl(
             l1_loss = F.l1_loss(reconstruction.float(), images.float())
             p_loss = perceptual_loss(reconstruction.float(), images.float())
 
-            kl_loss = 0.5 * torch.sum(z_mu.pow(2) + z_sigma.pow(2) - torch.log(z_sigma.pow(2)) - 1, dim=[1, 2, 3])
+            kl_loss = 0.5 * torch.sum(z_mu.pow(2) + z_sigma.pow(2) - torch.log(z_sigma.pow(2)) - 1, dim=[1, 2, 3, 4])
             kl_loss = torch.sum(kl_loss) / kl_loss.shape[0]
 
             if adv_weight > 0:
@@ -257,7 +258,7 @@ def eval_aekl(
             reconstruction, z_mu, z_sigma = model(x=images)
             l1_loss = F.l1_loss(reconstruction.float(), images.float())
             p_loss = perceptual_loss(reconstruction.float(), images.float())
-            kl_loss = 0.5 * torch.sum(z_mu.pow(2) + z_sigma.pow(2) - torch.log(z_sigma.pow(2)) - 1, dim=[1, 2, 3])
+            kl_loss = 0.5 * torch.sum(z_mu.pow(2) + z_sigma.pow(2) - torch.log(z_sigma.pow(2)) - 1, dim=[1, 2, 3, 4])
             kl_loss = torch.sum(kl_loss) / kl_loss.shape[0]
 
             if adv_weight > 0:
@@ -302,5 +303,12 @@ def eval_aekl(
 
     for k, v in total_losses.items():
         writer.add_scalar(f"{k}", v, step)
+
+    log_reconstructions(
+        image=images,
+        reconstruction=reconstruction,
+        writer=writer,
+        step=step,
+    )
 
     return total_losses["l1_loss"]

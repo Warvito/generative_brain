@@ -1,13 +1,17 @@
 from pathlib import Path
 from typing import Union
 
+import matplotlib.pyplot as plt
 import mlflow.pytorch
+import numpy as np
 import pandas as pd
+import torch
 from mlflow import start_run
 from monai import transforms
 from monai.data import PersistentDataset
 from omegaconf import OmegaConf
 from omegaconf.dictconfig import DictConfig
+from tensorboardX import SummaryWriter
 from torch.utils.data import DataLoader
 
 
@@ -177,3 +181,64 @@ def log_mlflow(
 
         raw_model = model.module if hasattr(model, "module") else model
         mlflow.pytorch.log_model(raw_model, "final_model")
+
+
+def get_figure(
+    img: torch.Tensor,
+    recons: torch.Tensor,
+):
+    img_npy_0 = np.clip(a=img[0, 0, :, :, 80].cpu().numpy(), a_min=0, a_max=1)
+    recons_npy_0 = np.clip(a=recons[0, 0, :, :, 80].cpu().numpy(), a_min=0, a_max=1)
+    img_npy_1 = np.clip(a=img[0, 0, :, :, 90].cpu().numpy(), a_min=0, a_max=1)
+    recons_npy_1 = np.clip(a=recons[0, 0, :, :, 90].cpu().numpy(), a_min=0, a_max=1)
+    img_npy_2 = np.clip(a=img[1, 0, :, :, 80].cpu().numpy(), a_min=0, a_max=1)
+    recons_npy_2 = np.clip(a=recons[1, 0, :, :, 80].cpu().numpy(), a_min=0, a_max=1)
+    img_npy_3 = np.clip(a=img[1, 0, :, :, 90].cpu().numpy(), a_min=0, a_max=1)
+    recons_npy_3 = np.clip(a=recons[1, 0, :, :, 90].cpu().numpy(), a_min=0, a_max=1)
+
+    img_row_0 = np.concatenate(
+        (
+            img_npy_0,
+            recons_npy_0,
+            img_npy_1,
+            recons_npy_1,
+        ),
+        axis=1,
+    )
+
+    img_row_1 = np.concatenate(
+        (
+            img_npy_2,
+            recons_npy_2,
+            img_npy_3,
+            recons_npy_3,
+        ),
+        axis=1,
+    )
+
+    img = np.concatenate(
+        (
+            img_row_0,
+            img_row_1,
+        ),
+        axis=0,
+    )
+
+    fig = plt.figure(dpi=300)
+    plt.imshow(img, cmap="gray")
+    plt.axis("off")
+    return fig
+
+
+def log_reconstructions(
+    image: torch.Tensor,
+    reconstruction: torch.Tensor,
+    writer: SummaryWriter,
+    step: int,
+    title: str = "RECONSTRUCTION",
+) -> None:
+    fig = get_figure(
+        image,
+        reconstruction,
+    )
+    writer.add_figure(title, fig, step)
