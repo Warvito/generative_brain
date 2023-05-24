@@ -8,6 +8,6 @@ runai submit \
   --run-as-user \
   --host-ipc \
   --project wds20 \
-  --volume /nfs/home/wds20/projects/generative-brain/:/project/ \
+  --volume /nfs/home/wds20/projects/generative_brain/:/project/ \
   --volume /nfs/project/AMIGO/Biobank/derivatives/super-res/:/data/ \
   --command -- sleep infinity
