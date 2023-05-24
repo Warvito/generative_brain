@@ -1,9 +1,13 @@
 from pathlib import Path
 from typing import Union
 
+import mlflow.pytorch
 import pandas as pd
+from mlflow import start_run
 from monai import transforms
 from monai.data import PersistentDataset
+from omegaconf import OmegaConf
+from omegaconf.dictconfig import DictConfig
 from torch.utils.data import DataLoader
 
 
@@ -134,3 +138,42 @@ def get_dataloader(
     )
 
     return train_loader, val_loader
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# LOGS
+# ----------------------------------------------------------------------------------------------------------------------
+def recursive_items(dictionary, prefix=""):
+    for key, value in dictionary.items():
+        if type(value) in [dict, DictConfig]:
+            yield from recursive_items(value, prefix=str(key) if prefix == "" else f"{prefix}.{str(key)}")
+        else:
+            yield (str(key) if prefix == "" else f"{prefix}.{str(key)}", value)
+
+
+def log_mlflow(
+    model,
+    config,
+    args,
+    experiment: str,
+    run_dir: Path,
+    val_loss: float,
+):
+    """Log model and performance on Mlflow system"""
+    config = {**OmegaConf.to_container(config), **vars(args)}
+    print(f"Setting mlflow experiment: {experiment}")
+    mlflow.set_experiment(experiment)
+
+    with start_run():
+        print(f"MLFLOW URI: {mlflow.tracking.get_tracking_uri()}")
+        print(f"MLFLOW ARTIFACT URI: {mlflow.get_artifact_uri()}")
+
+        for key, value in recursive_items(config):
+            mlflow.log_param(key, str(value))
+
+        mlflow.log_artifacts(str(run_dir / "train"), artifact_path="events_train")
+        mlflow.log_artifacts(str(run_dir / "val"), artifact_path="events_val")
+        mlflow.log_metric(f"loss", val_loss, 0)
+
+        raw_model = model.module if hasattr(model, "module") else model
+        mlflow.pytorch.log_model(raw_model, "final_model")

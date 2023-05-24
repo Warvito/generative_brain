@@ -13,7 +13,7 @@ from monai.utils import set_determinism
 from omegaconf import OmegaConf
 from tensorboardX import SummaryWriter
 from training_functions import train_aekl
-from util import get_dataloader
+from util import get_dataloader, log_mlflow
 
 warnings.filterwarnings("ignore")
 
@@ -84,6 +84,11 @@ def main(args):
 
     print(f"Let's use {torch.cuda.device_count()} GPUs!")
     device = torch.device("cuda")
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.DataParallel(model)
+        discriminator = torch.nn.DataParallel(discriminator)
+        perceptual_loss = torch.nn.DataParallel(perceptual_loss)
+
     model = model.to(device)
     perceptual_loss = perceptual_loss.to(device)
     discriminator = discriminator.to(device)
@@ -109,7 +114,7 @@ def main(args):
 
     # Train model
     print(f"Starting Training")
-    train_aekl(
+    val_loss = train_aekl(
         model=model,
         discriminator=discriminator,
         perceptual_loss=perceptual_loss,
@@ -129,6 +134,15 @@ def main(args):
         adv_weight=config["stage1"]["adv_weight"],
         perceptual_weight=config["stage1"]["perceptual_weight"],
         adv_start=args.adv_start,
+    )
+
+    log_mlflow(
+        model=model,
+        config=config,
+        args=args,
+        experiment=args.experiment,
+        run_dir=run_dir,
+        val_loss=val_loss,
     )
 
 
