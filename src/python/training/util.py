@@ -310,10 +310,10 @@ def get_figure(
     recons_npy_0 = np.clip(a=recons[0, 0, :, :, 80].cpu().numpy(), a_min=0, a_max=1)
     img_npy_1 = np.clip(a=img[0, 0, :, :, 90].cpu().numpy(), a_min=0, a_max=1)
     recons_npy_1 = np.clip(a=recons[0, 0, :, :, 90].cpu().numpy(), a_min=0, a_max=1)
-    img_npy_2 = np.clip(a=img[1, 0, :, :, 80].cpu().numpy(), a_min=0, a_max=1)
-    recons_npy_2 = np.clip(a=recons[1, 0, :, :, 80].cpu().numpy(), a_min=0, a_max=1)
-    img_npy_3 = np.clip(a=img[1, 0, :, :, 90].cpu().numpy(), a_min=0, a_max=1)
-    recons_npy_3 = np.clip(a=recons[1, 0, :, :, 90].cpu().numpy(), a_min=0, a_max=1)
+    img_npy_2 = np.clip(a=img[0, 0, :, :, 80].cpu().numpy(), a_min=0, a_max=1)
+    recons_npy_2 = np.clip(a=recons[0, 0, :, :, 80].cpu().numpy(), a_min=0, a_max=1)
+    img_npy_3 = np.clip(a=img[0, 0, :, :, 90].cpu().numpy(), a_min=0, a_max=1)
+    recons_npy_3 = np.clip(a=recons[0, 0, :, :, 90].cpu().numpy(), a_min=0, a_max=1)
 
     img_row_0 = np.concatenate(
         (
