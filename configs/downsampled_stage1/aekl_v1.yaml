@@ -1,6 +1,6 @@
 stage1:
-  base_lr: 0.00005
-  disc_lr: 0.0001
+  base_lr: 0.00001
+  disc_lr: 0.00005
   perceptual_weight: 0.002
   adv_weight: 0.005
   kl_weight: 0.00000001
