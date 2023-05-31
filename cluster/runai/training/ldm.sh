@@ -5,10 +5,10 @@ validation_ids="/project/outputs/ids/validation.tsv"
 stage1_uri="/project/mlruns/607723384106105441/bc3dd686601e43509125c46b02c19025/artifacts/final_model"
 config_file="/project/configs/ldm/ldm_v0.yaml"
 scale_factor=0.3
-batch_size=256
+batch_size=16
 n_epochs=500
 eval_freq=10
-num_workers=64
+num_workers=8
 experiment="LDM"
 
 runai submit \
