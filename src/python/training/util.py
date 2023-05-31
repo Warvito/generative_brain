@@ -60,7 +60,8 @@ def get_dataloader(
                 keys=["image"],
                 spatial_size=[160, 224, 160],
             ),
-            transforms.ToTensord(keys=["image"]),
+            ApplyTokenizerd(keys=["report"]),
+            transforms.ToTensord(keys=["image", "report"]),
         ]
     )
     if model_type == "autoencoder":
