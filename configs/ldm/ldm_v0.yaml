@@ -1,7 +1,7 @@
 ldm:
   base_lr: 0.000025
   params:
-    spatial_dims: 2
+    spatial_dims: 3
     in_channels: 3
     out_channels: 3
     num_res_blocks: 2
