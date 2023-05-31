@@ -180,7 +180,8 @@ def get_downsampled_dataloader(
                 keys=["image"],
                 spatial_size=[80, 112, 80],
             ),
-            transforms.ToTensord(keys=["image"]),
+            ApplyTokenizerd(keys=["report"]),
+            transforms.ToTensord(keys=["image", "report"]),
         ]
     )
     if model_type == "autoencoder":
@@ -247,6 +248,15 @@ def get_downsampled_dataloader(
                     keys=["image"],
                     spatial_size=[80, 112, 80],
                 ),
+                ApplyTokenizerd(keys=["report"]),
+                transforms.RandLambdad(
+                    keys=["report"],
+                    prob=0.10,
+                    func=lambda x: torch.cat(
+                        (49406 * torch.ones(1, 1), 49407 * torch.ones(1, x.shape[1] - 1)), 1
+                    ).long(),
+                ),  # 49406: BOS token 49407: PAD token
+                transforms.ToTensord(keys=["image", "report"]),
             ]
         )
 
