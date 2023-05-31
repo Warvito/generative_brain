@@ -1,0 +1,41 @@
+import argparse
+from pathlib import Path
+
+import pandas as pd
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--output_dir", help="Path to directory to save files with paths.")
+
+    args = parser.parse_args()
+    return args
+
+
+def main(args):
+    data_dir = Path("/data/")
+    images_paths = sorted(list(data_dir.glob("**/*T1w.nii.gz")) + list(data_dir.glob("**/*FLAIR.nii.gz")))
+
+    data_list = []
+    for image_path in images_paths:
+        if "unusable" not in str(image_path):
+            data_list.append({"image": str(image_path)})
+
+    data_df = pd.DataFrame(data_list)
+    data_df = data_df.sample(frac=1, random_state=42).reset_index(drop=True)
+
+    train_data_list = data_df[:80000]
+    val_data_list = data_df[80000:81000]
+    test_data_list = data_df[81000:]
+
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    train_data_list.to_csv(output_dir / "train_anycontrast.tsv", index=False, sep="\t")
+    val_data_list.to_csv(output_dir / "validation_anycontrast.tsv", index=False, sep="\t")
+    test_data_list.to_csv(output_dir / "test_anycontrast.tsv", index=False, sep="\t")
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    main(args)
