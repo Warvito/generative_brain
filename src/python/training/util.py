@@ -1,11 +1,13 @@
 from pathlib import Path
-from typing import Union
+from typing import Tuple, Union
 
 import matplotlib.pyplot as plt
 import mlflow.pytorch
 import numpy as np
 import pandas as pd
 import torch
+import torch.nn as nn
+from custom_transforms import ApplyTokenizerd
 from mlflow import start_run
 from monai import transforms
 from monai.data import PersistentDataset
@@ -13,6 +15,7 @@ from omegaconf import OmegaConf
 from omegaconf.dictconfig import DictConfig
 from tensorboardX import SummaryWriter
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -30,6 +33,7 @@ def get_datalist(
         data_dicts.append(
             {
                 "image": str(row["image"]),
+                "report": "T1-weighted image of a brain.",
             }
         )
 
@@ -115,6 +119,14 @@ def get_dataloader(
                 transforms.RandAdjustContrastd(keys=["image"], gamma=(0.97, 1.03), prob=0.1),
                 transforms.ThresholdIntensityd(keys=["image"], threshold=1, above=False, cval=1.0),
                 transforms.ThresholdIntensityd(keys=["image"], threshold=0, above=True, cval=0),
+                ApplyTokenizerd(keys=["report"]),
+                transforms.RandLambdad(
+                    keys=["report"],
+                    prob=0.10,
+                    func=lambda x: torch.cat(
+                        (49406 * torch.ones(1, 1), 49407 * torch.ones(1, x.shape[1] - 1)), 1
+                    ).long(),
+                ),  # 49406: BOS token 49407: PAD token
             ]
         )
 
@@ -471,3 +483,34 @@ def log_reconstructions(
         reconstruction,
     )
     writer.add_figure(title, fig, step)
+
+
+@torch.no_grad()
+def log_ldm_sample_unconditioned(
+    model: nn.Module,
+    stage1: nn.Module,
+    text_encoder,
+    scheduler: nn.Module,
+    spatial_shape: Tuple,
+    writer: SummaryWriter,
+    step: int,
+    device: torch.device,
+    scale_factor: float = 1.0,
+) -> None:
+    latent = torch.randn((1,) + spatial_shape)
+    latent = latent.to(device)
+
+    prompt_embeds = torch.cat((49406 * torch.ones(1, 1), 49407 * torch.ones(1, 76)), 1).long()
+    prompt_embeds = text_encoder(prompt_embeds.squeeze(1))
+    prompt_embeds = prompt_embeds[0]
+
+    for t in tqdm(scheduler.timesteps, ncols=70):
+        noise_pred = model(x=latent, timesteps=torch.asarray((t,)).to(device), context=prompt_embeds)
+        latent, _ = scheduler.step(noise_pred, t, latent)
+
+    x_hat = stage1.decode(latent / scale_factor)
+    img_0 = np.clip(a=x_hat[0, 0, :, :].cpu().numpy(), a_min=0, a_max=1)
+    fig = plt.figure(dpi=300)
+    plt.imshow(img_0, cmap="gray")
+    plt.axis("off")
+    writer.add_figure("SAMPLE", fig, step)
