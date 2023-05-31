@@ -1,17 +1,18 @@
 seed=42
-run_dir="aekl_anycontrast_v0"
-training_ids="/project/outputs/ids/train_anycontrast.tsv"
-validation_ids="/project/outputs/ids/validation_anycontrast.tsv"
-config_file="/project/configs/stage1/aekl_v0.yaml"
-batch_size=1
-n_epochs=20
-adv_start=5
-eval_freq=1
+run_dir="downsampled_aekl_v0_ldm_v0"
+training_ids="/project/outputs/ids/train.tsv"
+validation_ids="/project/outputs/ids/validation.tsv"
+stage1_uri="/project/mlruns/344968604149660181/00181802989a4a64b590acd78bb62ef7/artifacts/final_model"
+config_file="/project/configs/ldm/ldm_v0.yaml"
+scale_factor=0.3
+batch_size=4
+n_epochs=500
+eval_freq=10
 num_workers=8
-experiment="AEKL"
+experiment="LDM"
 
 runai submit \
-  --name brain-any-aekl-v0 \
+  --name brain-down-ldm-v0 \
   --image aicregistry:5000/wds20:ldm_brain \
   --backoff-limit 0 \
   --gpu 1 \
@@ -24,15 +25,16 @@ runai submit \
   --volume /nfs/home/wds20/projects/generative_brain/:/project/ \
   --volume /nfs/project/AMIGO/Biobank/derivatives/super-res/:/data/ \
   --command -- bash /project/src/bash/start_script.sh \
-    python3 /project/src/python/training/train_aekl_anycontrast.py \
+      python3 /project/src/python/training/train_downsampled_ldm.py \
       seed=${seed} \
       run_dir=${run_dir} \
       training_ids=${training_ids} \
       validation_ids=${validation_ids} \
+      stage1_uri=${stage1_uri} \
       config_file=${config_file} \
+      scale_factor=${scale_factor} \
       batch_size=${batch_size} \
       n_epochs=${n_epochs} \
-      adv_start=${adv_start} \
       eval_freq=${eval_freq} \
       num_workers=${num_workers} \
       experiment=${experiment}
