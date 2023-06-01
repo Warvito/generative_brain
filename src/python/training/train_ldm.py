@@ -12,7 +12,6 @@ from monai.config import print_config
 from monai.utils import set_determinism
 from omegaconf import OmegaConf
 from tensorboardX import SummaryWriter
-from torch import nn
 from training_functions import train_ldm
 from transformers import CLIPTextModel
 from util import get_dataloader, log_mlflow
@@ -38,17 +37,6 @@ def parse_args():
 
     args = parser.parse_args()
     return args
-
-
-class Stage1Wrapper(nn.Module):
-    """Wrapper for stage 1 model as a workaround for the DataParallel usage in the training loop."""
-
-    def __init__(self, model: nn.Module) -> None:
-        super().__init__()
-        self.model = model
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.model.encode_stage_2_inputs(x)
 
 
 def main(args):
@@ -89,7 +77,6 @@ def main(args):
     # Load Autoencoder to produce the latent representations
     print(f"Loading Stage 1 from {args.stage1_uri}")
     stage1 = mlflow.pytorch.load_model(args.stage1_uri)
-    stage1 = Stage1Wrapper(model=stage1)
     stage1.eval()
 
     # Create the diffusion model

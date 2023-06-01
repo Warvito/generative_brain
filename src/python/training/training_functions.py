@@ -429,7 +429,7 @@ def train_epoch_ldm(
         optimizer.zero_grad(set_to_none=True)
         with autocast(enabled=True):
             with torch.no_grad():
-                e = stage1(images) * scale_factor
+                e = stage1.encode_stage_2_inputs(images) * scale_factor
 
             prompt_embeds = text_encoder(reports.squeeze(1))
             prompt_embeds = prompt_embeds[0]
@@ -483,7 +483,7 @@ def eval_ldm(
         timesteps = torch.randint(0, scheduler.num_train_timesteps, (images.shape[0],), device=device).long()
 
         with autocast(enabled=True):
-            e = stage1(images) * scale_factor
+            e = stage1.encode_stage_2_inputs(images) * scale_factor
 
             prompt_embeds = text_encoder(reports.squeeze(1))
             prompt_embeds = prompt_embeds[0]
