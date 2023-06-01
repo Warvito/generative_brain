@@ -48,9 +48,7 @@ class Stage1Wrapper(nn.Module):
         self.model = model
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        z_mu, z_sigma = self.model.encode(x)
-        z = self.model.sampling(z_mu, z_sigma)
-        return z
+        return self.model.encode_stage_2_inputs(x)
 
 
 def main(args):
