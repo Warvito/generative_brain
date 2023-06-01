@@ -5,18 +5,18 @@ validation_ids="/project/outputs/ids/validation.tsv"
 stage1_uri="/project/mlruns/344968604149660181/00181802989a4a64b590acd78bb62ef7/artifacts/final_model"
 config_file="/project/configs/downsampled_ldm/ldm_v0.yaml"
 scale_factor=0.3
-batch_size=4
+batch_size=16
 n_epochs=25
-eval_freq=10
-num_workers=8
+eval_freq=1
+num_workers=16
 experiment="LDM"
 
 runai submit \
   --name brain-down-ldm-v0 \
   --image aicregistry:5000/wds20:ldm_brain \
   --backoff-limit 0 \
-  --gpu 1 \
-  --cpu 4 \
+  --gpu 2 \
+  --cpu 8 \
   --large-shm \
   --run-as-user \
   --node-type "A100" \
