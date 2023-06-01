@@ -658,7 +658,7 @@ def log_ldm_sample_unconditioned(
         latent, _ = scheduler.step(noise_pred, t, latent)
 
     x_hat = stage1.decode(latent / scale_factor)
-    img_0 = np.clip(a=x_hat[0, 0, :, :].cpu().numpy(), a_min=0, a_max=1)
+    img_0 = np.clip(a=x_hat[0, 0, :, :, 60].cpu().numpy(), a_min=0, a_max=1)
     fig = plt.figure(dpi=300)
     plt.imshow(img_0, cmap="gray")
     plt.axis("off")
