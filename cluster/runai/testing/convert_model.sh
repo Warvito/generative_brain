@@ -10,10 +10,12 @@ runai submit \
   --cpu 4 \
   --large-shm \
   --run-as-user \
+  --node-type "A100" \
   --host-ipc \
   --project wds20 \
   --volume /nfs/home/wds20/projects/generative_brain/:/project/ \
-  --command -- python3 /project/src/python/testing/convert_mlflow_to_pytorch.py \
-      --stage1_mlflow_path=${stage1_mlflow_path} \
-      --diffusion_mlflow_path=${diffusion_mlflow_path} \
-      --output_dir=${output_dir}
+  --command -- bash /project/src/bash/start_script.sh \
+    python3 /project/src/python/testing/convert_mlflow_to_pytorch.py \
+      stage1_mlflow_path=${stage1_mlflow_path} \
+      diffusion_mlflow_path=${diffusion_mlflow_path} \
+      output_dir=${output_dir}
