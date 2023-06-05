@@ -91,7 +91,7 @@ def main(args):
 
     for i in range(args.start_seed, args.stop_seed):
         set_determinism(seed=i)
-        noise = torch.randn((1, config["ldm"]["params"]["in_channels"], args.x_size, args.y_size, args.y_size)).to(
+        noise = torch.randn((1, config["ldm"]["params"]["in_channels"], args.x_size, args.y_size, args.z_size)).to(
             device
         )
 

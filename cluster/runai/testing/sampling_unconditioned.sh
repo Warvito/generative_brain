@@ -3,7 +3,7 @@ stage1_path="/project/outputs/trained_models/autoencoder.pth"
 diffusion_path="/project/outputs/trained_models/diffusion_model.pth"
 stage1_config_file_path="/project/configs/stage1/aekl_v0.yaml"
 diffusion_config_file_path="/project/configs/ldm/ldm_v0.yaml"
-reference_path="/project/outputs/reference_image.nii.gz"
+reference_path="/project/outputs/reference_image/sub-1000126_ses-1_T1w.nii.gz"
 start_seed=0
 stop_seed=10
 prompt="uncondtioned"
@@ -32,6 +32,7 @@ runai submit \
       diffusion_path=${diffusion_path} \
       stage1_config_file_path=${stage1_config_file_path} \
       diffusion_config_file_path=${diffusion_config_file_path} \
+      reference_path=${reference_path} \
       start_seed=${start_seed} \
       stop_seed=${stop_seed} \
       prompt=${prompt} \
