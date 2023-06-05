@@ -87,7 +87,7 @@ def main(args):
     prompt_embeds = text_encoder(text_input_ids.squeeze(1))
     prompt_embeds = prompt_embeds[0].to(device)
 
-    reference_image = nib.load(args.reference_image)
+    reference_image = nib.load(args.reference_path)
 
     for i in range(args.start_seed, args.stop_seed):
         set_determinism(seed=i)

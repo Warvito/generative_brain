@@ -3,6 +3,7 @@ stage1_path="/project/outputs/trained_models/autoencoder.pth"
 diffusion_path="/project/outputs/trained_models/diffusion_model.pth"
 stage1_config_file_path="/project/configs/stage1/aekl_v0.yaml"
 diffusion_config_file_path="/project/configs/ldm/ldm_v0.yaml"
+reference_path="/project/outputs/reference_image.nii.gz"
 start_seed=0
 stop_seed=10
 prompt="uncondtioned"
@@ -14,8 +15,8 @@ scale_factor=0.3
 num_inference_steps=200
 
 runai submit \
-  --name  sampling-brain-0 \
-  --image aicregistry:5000/wds20:ldm_mammography \
+  --name  brain-sampling-0 \
+  --image aicregistry:5000/wds20:ldm_brain \
   --backoff-limit 0 \
   --gpu 1 \
   --cpu 4 \
