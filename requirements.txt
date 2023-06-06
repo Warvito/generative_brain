@@ -12,3 +12,4 @@ mlflow
 pandas
 matplotlib
 pynvml
+gdown

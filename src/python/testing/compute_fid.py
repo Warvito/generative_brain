@@ -41,7 +41,7 @@ def main(args):
 
     # Samples
     samples_datalist = []
-    for sample_path in sorted(list(samples_dir.glob("*.jpg"))):
+    for sample_path in sorted(list(samples_dir.glob("*.nii.gz"))):
         samples_datalist.append(
             {
                 "image": str(sample_path),
@@ -78,15 +78,15 @@ def main(args):
     for batch in tqdm(samples_loader):
         img = batch["image"]
         with torch.no_grad():
-            outputs = model.features(img.to(device))
-            outputs = F.adaptive_avg_pool2d(outputs, 1).squeeze(-1).squeeze(-1)  # Global average pooling
+            outputs = model(img.to(device))
+            outputs = F.adaptive_avg_pool3d(outputs, 1).squeeze(-1).squeeze(-1).squeeze(-1)  # Global average pooling
 
         samples_features.append(outputs.cpu())
     samples_features = torch.cat(samples_features, dim=0)
 
     # Test set
     test_loader = get_test_dataloader(
-        batch_size=1,
+        batch_size=16,
         test_ids=args.test_ids,
         num_workers=args.num_workers,
         upper_limit=1000,
@@ -96,8 +96,8 @@ def main(args):
     for batch in tqdm(test_loader):
         img = batch["image"]
         with torch.no_grad():
-            outputs = model.features(img.to(device))
-            outputs = F.adaptive_avg_pool2d(outputs, 1).squeeze(-1).squeeze(-1)  # Global average pooling
+            outputs = model(img.to(device))
+            outputs = F.adaptive_avg_pool3d(outputs, 1).squeeze(-1).squeeze(-1).squeeze(-1)  # Global average pooling
 
         test_features.append(outputs.cpu())
     test_features = torch.cat(test_features, dim=0)
@@ -107,6 +107,7 @@ def main(args):
     fid = metric(samples_features, test_features)
 
     print(f"FID: {fid:.6f}")
+    print(fid)
 
 
 if __name__ == "__main__":
