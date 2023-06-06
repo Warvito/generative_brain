@@ -106,7 +106,6 @@ def main(args):
     metric = FIDMetric()
     fid = metric(samples_features, test_features)
 
-    print(f"FID: {fid:.6f}")
     print(fid)
 
 
