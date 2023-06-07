@@ -308,7 +308,7 @@ def get_upsampler_dataloader(
             transforms.CopyItemsd(keys=["image"], times=1, names=["low_res_image"]),
             transforms.Resized(
                 keys=["low_res_image"],
-                spatial_size=[20, 28, 20],
+                spatial_size=[40, 56, 40],
             ),
             ApplyTokenizerd(keys=["report"]),
             transforms.ToTensord(keys=["image", "low_res_image", "report"]),
@@ -328,7 +328,7 @@ def get_upsampler_dataloader(
             transforms.CopyItemsd(keys=["image"], times=1, names=["low_res_image"]),
             transforms.Resized(
                 keys=["low_res_image"],
-                spatial_size=[20, 28, 20],
+                spatial_size=[40, 56, 40],
             ),
             ApplyTokenizerd(keys=["report"]),
             transforms.ToTensord(keys=["image", "low_res_image", "report"]),
