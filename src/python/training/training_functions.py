@@ -729,6 +729,9 @@ def eval_upsampler_ldm(
                 original_samples=low_res_image, noise=low_res_noise, timesteps=low_res_timesteps
             )
 
+            print(noisy_e.shape)
+            print(noisy_low_res_image.shape)
+
             latent_model_input = torch.cat([noisy_e, noisy_low_res_image], dim=1)
 
             noise_pred = model(

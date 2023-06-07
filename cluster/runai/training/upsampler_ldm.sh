@@ -1,5 +1,5 @@
 seed=42
-run_dir="aekl_v0_ldm_v0"
+run_dir="aekl_v0_ldm_v0_upsampler"
 training_ids="/project/outputs/ids/train.tsv"
 validation_ids="/project/outputs/ids/validation.tsv"
 stage1_uri="/project/mlruns/751866889003045521/a2cb93e5a920445e932ce29e09bd5a82/artifacts/final_model"
