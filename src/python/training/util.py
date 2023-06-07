@@ -292,7 +292,6 @@ def get_upsampler_dataloader(
     training_ids: str,
     validation_ids: str,
     num_workers: int = 8,
-    model_type: str = "autoencoder",
 ):
     # Define transformations
     val_transforms = transforms.Compose(
@@ -306,69 +305,35 @@ def get_upsampler_dataloader(
                 spatial_size=[160, 224, 160],
             ),
             transforms.RandSpatialCropd(keys=["image"], roi_size=[80, 112, 80], random_size=False),
-            transforms.ToTensord(keys=["image"]),
+            transforms.CopyItemsd(keys=["image"], times=1, names=["low_res_image"]),
+            transforms.Resized(
+                keys=["low_res_image"],
+                spatial_size=[20, 28, 20],
+            ),
+            ApplyTokenizerd(keys=["report"]),
+            transforms.ToTensord(keys=["image", "low_res_image", "report"]),
         ]
     )
-    if model_type == "autoencoder":
-        train_transforms = transforms.Compose(
-            [
-                transforms.LoadImaged(keys=["image"]),
-                transforms.EnsureChannelFirstd(keys=["image"]),
-                transforms.ScaleIntensityd(keys=["image"], minv=0.0, maxv=1.0),
-                transforms.SpatialCropd(keys=["image"], roi_start=[16, 16, 96], roi_end=[176, 240, 256]),
-                transforms.SpatialPadd(
-                    keys=["image"],
-                    spatial_size=[160, 224, 160],
-                ),
-                transforms.RandFlipd(
-                    keys=["image"],
-                    spatial_axis=0,
-                    prob=0.5,
-                ),
-                transforms.RandAffined(
-                    keys=["image"],
-                    translate_range=(1, 1, 1),
-                    scale_range=(-0.02, 0.02),
-                    spatial_size=[160, 224, 160],
-                    prob=0.1,
-                ),
-                transforms.RandShiftIntensityd(keys=["image"], offsets=0.05, prob=0.1),
-                transforms.RandAdjustContrastd(keys=["image"], gamma=(0.97, 1.03), prob=0.1),
-                transforms.ThresholdIntensityd(keys=["image"], threshold=1, above=False, cval=1.0),
-                transforms.ThresholdIntensityd(keys=["image"], threshold=0, above=True, cval=0),
-                transforms.RandSpatialCropd(keys=["image"], roi_size=[80, 112, 80], random_size=False),
-            ]
-        )
-    if model_type == "diffusion":
-        train_transforms = transforms.Compose(
-            [
-                transforms.LoadImaged(keys=["image"]),
-                transforms.EnsureChannelFirstd(keys=["image"]),
-                transforms.ScaleIntensityd(keys=["image"], minv=0.0, maxv=1.0),
-                transforms.SpatialCropd(keys=["image"], roi_start=[16, 16, 96], roi_end=[176, 240, 256]),
-                transforms.SpatialPadd(
-                    keys=["image"],
-                    spatial_size=[160, 224, 160],
-                ),
-                transforms.RandFlipd(
-                    keys=["image"],
-                    spatial_axis=0,
-                    prob=0.5,
-                ),
-                transforms.RandAffined(
-                    keys=["image"],
-                    translate_range=(1, 1, 1),
-                    scale_range=(-0.02, 0.02),
-                    spatial_size=[160, 224, 160],
-                    prob=0.1,
-                ),
-                transforms.RandShiftIntensityd(keys=["image"], offsets=0.05, prob=0.1),
-                transforms.RandAdjustContrastd(keys=["image"], gamma=(0.97, 1.03), prob=0.1),
-                transforms.ThresholdIntensityd(keys=["image"], threshold=1, above=False, cval=1.0),
-                transforms.ThresholdIntensityd(keys=["image"], threshold=0, above=True, cval=0),
-                transforms.RandSpatialCropd(keys=["image"], roi_size=[80, 112, 80], random_size=False),
-            ]
-        )
+    train_transforms = transforms.Compose(
+        [
+            transforms.LoadImaged(keys=["image"]),
+            transforms.EnsureChannelFirstd(keys=["image"]),
+            transforms.ScaleIntensityd(keys=["image"], minv=0.0, maxv=1.0),
+            transforms.SpatialCropd(keys=["image"], roi_start=[16, 16, 96], roi_end=[176, 240, 256]),
+            transforms.SpatialPadd(
+                keys=["image"],
+                spatial_size=[160, 224, 160],
+            ),
+            transforms.RandSpatialCropd(keys=["image"], roi_size=[80, 112, 80], random_size=False),
+            transforms.CopyItemsd(keys=["image"], times=1, names=["low_res_image"]),
+            transforms.Resized(
+                keys=["low_res_image"],
+                spatial_size=[20, 28, 20],
+            ),
+            ApplyTokenizerd(keys=["report"]),
+            transforms.ToTensord(keys=["image", "low_res_image", "report"]),
+        ]
+    )
 
     train_dicts = get_datalist(ids_path=training_ids)
     train_ds = PersistentDataset(data=train_dicts, transform=train_transforms, cache_dir=str(cache_dir))
