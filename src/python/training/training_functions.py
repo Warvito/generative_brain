@@ -754,17 +754,4 @@ def eval_upsampler_ldm(
     for k, v in total_losses.items():
         writer.add_scalar(f"{k}", v, step)
 
-    if sample:
-        log_ldm_sample_unconditioned(
-            model=raw_model,
-            stage1=raw_stage1,
-            scheduler=scheduler,
-            text_encoder=text_encoder,
-            spatial_shape=tuple(e.shape[1:]),
-            writer=writer,
-            step=step,
-            device=device,
-            scale_factor=scale_factor,
-        )
-
     return total_losses["loss"]
