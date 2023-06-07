@@ -656,7 +656,7 @@ def train_epoch_upsampler_ldm(
             prompt_embeds = prompt_embeds[0]
 
             noise = torch.randn_like(e).to(device)
-            low_res_noise = torch.randn_like(e).to(low_res_image)
+            low_res_noise = torch.randn_like(low_res_image).to(low_res_image)
             noisy_e = scheduler.add_noise(original_samples=e, noise=noise, timesteps=timesteps)
             noisy_low_res_image = low_res_scheduler.add_noise(
                 original_samples=low_res_image, noise=low_res_noise, timesteps=low_res_timesteps
@@ -723,7 +723,7 @@ def eval_upsampler_ldm(
             prompt_embeds = prompt_embeds[0]
 
             noise = torch.randn_like(e).to(device)
-            low_res_noise = torch.randn_like(e).to(low_res_image)
+            low_res_noise = torch.randn_like(low_res_image).to(low_res_image)
             noisy_e = scheduler.add_noise(original_samples=e, noise=noise, timesteps=timesteps)
             noisy_low_res_image = low_res_scheduler.add_noise(
                 original_samples=low_res_image, noise=low_res_noise, timesteps=low_res_timesteps
