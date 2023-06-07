@@ -53,7 +53,7 @@ def main(args):
         [
             transforms.LoadImaged(keys=["image"]),
             transforms.EnsureChannelFirstd(keys=["image"]),
-            transforms.ScaleIntensityd(keys=["image"], minv=0.0, maxv=1.0),
+            transforms.ScaleIntensityRanged(keys=["image"], a_min=0.0, a_max=255.0, b_min=0.0, b_max=1.0, clip=True),
             transforms.SpatialCropd(keys=["image"], roi_start=[16, 16, 96], roi_end=[176, 240, 256]),
             transforms.SpatialPadd(
                 keys=["image"],
@@ -79,7 +79,7 @@ def main(args):
         img = batch["image"]
         with torch.no_grad():
             outputs = model(img.to(device))
-            outputs = F.adaptive_avg_pool3d(outputs, 1).squeeze(-1).squeeze(-1).squeeze(-1)  # Global average pooling
+            outputs = F.adaptive_avg_pool3d(outputs, (1, 1, 1)).view(outputs.size(0), -1)  # Global average pooling
 
         samples_features.append(outputs.cpu())
     samples_features = torch.cat(samples_features, dim=0)
