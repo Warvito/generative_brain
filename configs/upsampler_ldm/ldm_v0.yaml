@@ -5,11 +5,11 @@ ldm:
     in_channels: 4
     out_channels: 3
     num_res_blocks: 2
-    num_channels: [256, 512, 768]
-    attention_levels: [False, True, True]
+    num_channels: [256, 256, 512]
+    attention_levels: [False, False, True]
     with_conditioning: True
     cross_attention_dim: 1024
-    num_head_channels: [0, 64, 96]
+    num_head_channels: [0, 0, 512]
   scheduler:
     schedule: "scaled_linear_beta"
     num_train_timesteps: 1000
