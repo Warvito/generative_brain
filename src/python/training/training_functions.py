@@ -336,7 +336,6 @@ def train_ldm(
     scale_factor: float = 1.0,
 ) -> float:
     scaler = GradScaler()
-    raw_model = model.module if hasattr(model, "module") else model
 
     val_loss = eval_ldm(
         model=model,
@@ -396,11 +395,11 @@ def train_ldm(
             if val_loss <= best_loss:
                 print(f"New best val loss {val_loss}")
                 best_loss = val_loss
-                torch.save(raw_model.state_dict(), str(run_dir / "best_model.pth"))
+                torch.save(model.state_dict(), str(run_dir / "best_model.pth"))
 
     print(f"Training finished!")
     print(f"Saving final model...")
-    torch.save(raw_model.state_dict(), str(run_dir / "final_model.pth"))
+    torch.save(model.state_dict(), str(run_dir / "final_model.pth"))
 
     return val_loss
 
@@ -473,8 +472,6 @@ def eval_ldm(
     scale_factor: float = 1.0,
 ) -> float:
     model.eval()
-    raw_stage1 = stage1.module if hasattr(stage1, "module") else stage1
-    raw_model = model.module if hasattr(model, "module") else model
     total_losses = OrderedDict()
 
     for x in loader:
@@ -513,8 +510,8 @@ def eval_ldm(
 
     if sample:
         log_ldm_sample_unconditioned(
-            model=raw_model,
-            stage1=raw_stage1,
+            model=model,
+            stage1=stage1,
             scheduler=scheduler,
             text_encoder=text_encoder,
             spatial_shape=tuple(e.shape[1:]),

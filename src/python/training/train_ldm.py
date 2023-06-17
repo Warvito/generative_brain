@@ -87,11 +87,6 @@ def main(args):
 
     print(f"Let's use {torch.cuda.device_count()} GPUs!")
     device = torch.device("cuda")
-    if torch.cuda.device_count() > 1:
-        stage1 = torch.nn.DataParallel(stage1)
-        diffusion = torch.nn.DataParallel(diffusion)
-        text_encoder = torch.nn.DataParallel(text_encoder)
-
     stage1 = stage1.to(device)
     diffusion = diffusion.to(device)
     text_encoder = text_encoder.to(device)
