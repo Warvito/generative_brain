@@ -17,6 +17,7 @@ runai submit \
   --backoff-limit 0 \
   --gpu 1 \
   --cpu 4 \
+  --memory-limit 256G \
   --large-shm \
   --run-as-user \
   --node-type "A100" \
