@@ -2,7 +2,7 @@ seed=42
 sample_dir="/project/outputs/samples_unconditioned/"
 test_ids="/project/outputs/ids/test.tsv"
 num_workers=4
-batch_size=1
+batch_size=16
 
 runai submit \
   --name brain-fid \

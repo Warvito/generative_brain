@@ -11,7 +11,7 @@ from monai.data import Dataset
 from monai.utils import set_determinism
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from util import get_test_dataloader
+from util import get_datalist
 
 
 def parse_args():
@@ -53,7 +53,7 @@ def main(args):
         [
             transforms.LoadImaged(keys=["image"]),
             transforms.EnsureChannelFirstd(keys=["image"]),
-            transforms.ScaleIntensityRanged(keys=["image"], a_min=0.0, a_max=255.0, b_min=0.0, b_max=1.0, clip=True),
+            transforms.NormalizeIntensityd(keys=["image"]),
             transforms.ToTensord(keys=["image"]),
         ]
     )
@@ -80,11 +80,31 @@ def main(args):
     samples_features = torch.cat(samples_features, dim=0)
 
     # Test set
-    test_loader = get_test_dataloader(
-        batch_size=16,
-        test_ids=args.test_ids,
+    test_transforms = transforms.Compose(
+        [
+            transforms.LoadImaged(keys=["image"]),
+            transforms.EnsureChannelFirstd(keys=["image"]),
+            transforms.ScaleIntensityd(keys=["image"], minv=0.0, maxv=1.0),
+            transforms.SpatialCropd(keys=["image"], roi_start=[16, 16, 96], roi_end=[176, 240, 256]),
+            transforms.SpatialPadd(
+                keys=["image"],
+                spatial_size=[160, 224, 160],
+            ),
+            transforms.NormalizeIntensityd(keys=["image"]),
+            transforms.ToTensord(keys=["image"]),
+        ]
+    )
+
+    test_dicts = get_datalist(ids_path=args.test_ids, upper_limit=1000)
+    test_ds = Dataset(data=test_dicts, transform=test_transforms)
+    test_loader = DataLoader(
+        test_ds,
+        batch_size=args.batch_size,
+        shuffle=False,
         num_workers=args.num_workers,
-        upper_limit=1000,
+        drop_last=False,
+        pin_memory=False,
+        persistent_workers=True,
     )
 
     test_features = []
