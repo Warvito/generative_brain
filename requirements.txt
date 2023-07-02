@@ -1,15 +1,14 @@
-lpips==0.1.4
-pre-commit
-monai[nibabel]>=1.2.0rc1
-tensorboardX
-omegaconf==2.3.0
-spacy
-transformers[torch]
-isort
 black
-monai-generative
-mlflow
-pandas
-matplotlib
-pynvml
 gdown
+isort
+lpips==0.1.4
+monai-generative
+monai[nibabel, matplotlib, pandas, mlflow, tqdm]==1.2.0
+numpy==1.22.2
+omegaconf==2.3.0
+pre-commit
+protobuf==3.20.3
+pynvml
+spacy
+tensorboardX
+transformers[torch]==4.30.2

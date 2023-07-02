@@ -64,9 +64,9 @@ def main(args):
     )
     samples_loader = DataLoader(
         samples_ds,
-        batch_size=16,
+        batch_size=args.batch_size,
         shuffle=False,
-        num_workers=8,
+        num_workers=args.num_workers,
     )
 
     samples_features = []
